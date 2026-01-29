@@ -1,0 +1,73 @@
+---
+title: "Linear Regression Analysis Report"
+author: "Grace Hardy"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+options(repos = c(CRAN = "http://cran.us.r-project.org"))
+install.packages(c(
+  "broom",
+  "car",
+  "caret",
+  "MASS",
+  "glmnet",
+  "lmtest", 
+  "ggplot2", 
+  "remotes",
+  "rlang",
+  "here"))
+
+library(tidyverse)
+library(broom)
+library(ggplot2)
+library(lmtest)
+library(car)
+library(caret)
+library(MASS)
+library(glmnet)
+library(remotes)
+library(rlang)
+library(here)
+```
+
+```{r fileload, include=FALSE}
+insurance_path <- here("Data", "insurance.csv")
+
+if (file.exists(insurance_path)) {
+  insurance_df <- tryCatch(
+    read.csv(insurance_path, stringsAsFactors = FALSE),
+    error = function(e) {
+      stop("Error reading CSV file: ", e$message)
+    }
+  )
+  cat("Insurance file loaded successfully.\n")
+} else {
+  cat("Insurance file not found in current working directory.\n")
+}
+```
+
+
+# 1. Exploratory Analysis
+
+# Print the first few rows
+```{r head, echo=FALSE}
+head(insurance_df)
+```
+
+# Print the last few rows
+```{r tail, echo=FALSE}
+tail(insurance_df)
+```
+
+# Summary statistics
+```{r summary, echo=FALSE}
+summary(insurance_df)
+```
+
+# Display the type of each variable
+```{r type, echo =FALSE}
+str(insurance_df)
+```
+
