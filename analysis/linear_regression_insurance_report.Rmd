@@ -6,7 +6,10 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+# Set up such that as part of this report all required packages are installed using repo = http://cran.us.r-project.org
+
 options(repos = c(CRAN = "http://cran.us.r-project.org"))
+# Install required packages
 install.packages(c(
   "broom",
   "car",
@@ -19,6 +22,7 @@ install.packages(c(
   "rlang",
   "here"))
 
+# Load packages 
 library(tidyverse)
 library(broom)
 library(ggplot2)
@@ -33,8 +37,10 @@ library(here)
 ```
 
 ```{r fileload, include=FALSE}
+# Create file path, the here function enables files to be located relative to the project root
 insurance_path <- here("Data", "insurance.csv")
 
+#tryCatch statement to safely try loading insurance data
 if (file.exists(insurance_path)) {
   insurance_df <- tryCatch(
     read.csv(insurance_path, stringsAsFactors = FALSE),
@@ -51,23 +57,130 @@ if (file.exists(insurance_path)) {
 
 # 1. Exploratory Analysis
 
-# Print the first few rows
+Print the first few rows of the insurance data:
 ```{r head, echo=FALSE}
+# Use head function to display first 6 rows 
 head(insurance_df)
 ```
 
-# Print the last few rows
+Print the last few rows of the insurance data:
 ```{r tail, echo=FALSE}
+# Use tail function to display last 6 rows 
 tail(insurance_df)
 ```
 
-# Summary statistics
+Column headings look as if they have accurate meaning, no obvious data errors or formatting issues. 
+
+Summary statistics of the insurance data:
 ```{r summary, echo=FALSE}
-summary(insurance_df)
+# Use summary function to display summary statistics of data frame 
+ summary(insurance_df)
 ```
 
-# Display the type of each variable
+Display the type of each variable:
 ```{r type, echo =FALSE}
 str(insurance_df)
 ```
 
+Minimum and Maximum seem reasonable values. For charges, the mean is significantly larger than the median which could indicate right skewness or presence of outlier values, this is further indicated by the large max value in comparison to the 3rd quartile value. No indication of any missing values. 
+
+```{r outliers, echo =FALSE}
+#Use boxplot function to check for outliers in charges data by plotting a boxplot
+boxplot(insurance_df$charges, main = "Box Plot of Charges")
+#Use hist function to check for outliers in charges data by plotting a histogram
+hist(insurance_df$charges, main = "Histogram of Charges",  xlab = "Charges")
+```
+
+Extreme values indicated by box and histogram plots are to be kept as they are plausible real-world values.
+
+
+Check before fitting the model, conceptually linear regression is a good fit against numeric variables:
+```{r scatter, echo =FALSE}
+# Define Variables based on columns in the insurance data frame
+charges <- insurance_df$charges
+bmi <- insurance_df$bmi
+sex <- insurance_df$sex
+age <- insurance_df$age
+region <- insurance_df$age
+children <- insurance_df$children
+smoker <- insurance_df$smoker
+
+#Plot a scatter plot of charges and BMI
+plot(charges ~ bmi, main = "Scatter plot of BMI and Charges")
+#Plot a scatter plot of charges and Age
+plot(charges ~ age, main = "Scatter plot of Age and Charges")
+#Plot a scatter plot of charges and no. of children
+plot(charges ~ children, main = "Scatter plot of Children and Charges")
+
+```
+Scatter plot indicates some correlation between BMI and charges, indicating potential suitability for a linear regression model. Same can be said between age and charges. In both cases, there are other clusters that may imply that another variable should be included in the model.  
+
+# 2. Fit Linear Regression model
+
+```{r lm comment, echo=FALSE}
+#Use lm function to fit a linear regression model
+```
+
+```{r lm}
+model <- lm(charges ~ bmi + sex + age + region + children + smoker)
+```
+
+# 3. Model Summary 
+```{r model, echo=FALSE}
+#Use summary function to display summary statistics of the linear regression model
+summary(model)
+```
+
+P-value's for bmi, age, children and smoker are all less than 0.05 which indicates they are statistically significant in predicting charges.
+
+Sex has a p-value of 0.699641 and the coefficients were not defined because of singularities. These can be removed from the model. 
+
+```{r model_v1, echo=FALSE}
+#Use lm function to fit a linear regression model
+model_v1 <- lm(charges ~ bmi + age + children + smoker)
+#Use summary function to display summary statistics of the linear regression model
+summary(model_v1)
+```
+
+The R-Square value of 0.7497 indicate that this model has fairly good predictive power as closer to one than zero. 
+
+However, residual standard error of 6068 on 1333 degrees of freedom indicates that the average amount that the data points deviate from the regression line is quite high, suggesting that the model is weaker at matching the data. 
+
+# 4. Check Assumptions
+
+```{r assumptions,echo=FALSE}
+# Use par function to set up a 2x2 plot area
+par(mfrow = c(2,2))
+
+# Use plot to generate diagnostic plots
+plot(model_v1)
+```
+
+- Independence: Can only be verified on data collection.
+- Linearity: Assumption met as no clear pattern in the scatter-plot in the Residuals vs Fitted plot.
+- Homoscedasticity: Residuals cluster in two areas on the Scale - Location plot, so does not meet this assumption that residuals are spread out with no clear pattern.
+- Normality: Assumption not met as data deviates from the reference line of 45 degrees on the Q-Q plot.
+
+
+# 5. Predicting Values
+
+```{r predicting, echo = FALSE}
+# Create a dataframe with new values
+new_data <- data.frame (bmi = 54, age = 22, children = 0,  smoker = "yes")
+
+# Using the linear regression model, create a prediction
+prediction <- predict(model_v1, newdata = new_data)
+
+# Output the new predicted value from the model
+prediction
+```
+
+# 6 . Visualise 
+```{r visualise, echo = FALSE}
+# Use ggplot to visually represent the linear regression model
+ggplot(insurance_df, aes( x = bmi + age + children, y = charges, color = smoker)) + geom_point() + geom_smooth(method = "lm", col = "blue") + labs(title = "Linear Regression of BMI, Age, No. of Children and Smoker (Y/N) on Charges ", x = "BMI, Age, Children and Smoker (Yes/No) ", y = "Charges")
+```
+
+# 7. Conclusion 
+
+Also there were some strong p-values for age, BMI and smoker's indicating some strong statistical significant in predicting charges. The linear regression is limited as all Homoscedasticity and Normality assumptions were not met. 
