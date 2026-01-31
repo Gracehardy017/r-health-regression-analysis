@@ -101,7 +101,7 @@ charges <- insurance_df$charges
 bmi <- insurance_df$bmi
 sex <- insurance_df$sex
 age <- insurance_df$age
-region <- insurance_df$age
+region <- insurance_df$region
 children <- insurance_df$children
 smoker <- insurance_df$smoker
 
@@ -113,6 +113,7 @@ plot(charges ~ age, main = "Scatter plot of Age and Charges")
 plot(charges ~ children, main = "Scatter plot of Children and Charges")
 
 ```
+
 Scatter plot indicates some correlation between BMI and charges, indicating potential suitability for a linear regression model. Same can be said between age and charges. In both cases, there are other clusters that may imply that another variable should be included in the model.  
 
 # 2. Fit Linear Regression model
@@ -133,7 +134,7 @@ summary(model)
 
 P-value's for bmi, age, children and smoker are all less than 0.05 which indicates they are statistically significant in predicting charges.
 
-Sex has a p-value of 0.699641 and the coefficients were not defined because of singularities. These can be removed from the model. 
+Sex has a p-value of 0.699641 and the p-values for the various regions have p-values above 0.01. These can be removed from the model. 
 
 ```{r model_v1, echo=FALSE}
 #Use lm function to fit a linear regression model
@@ -145,6 +146,8 @@ summary(model_v1)
 The R-Square value of 0.7497 indicate that this model has fairly good predictive power as closer to one than zero. 
 
 However, residual standard error of 6068 on 1333 degrees of freedom indicates that the average amount that the data points deviate from the regression line is quite high, suggesting that the model is weaker at matching the data. 
+
+When comparing 2 people with all other variables the same, the average predicted charges grow by 23811.40 if the person is a smoker.
 
 # 4. Check Assumptions
 
@@ -176,11 +179,22 @@ prediction
 ```
 
 # 6 . Visualise 
+```{r visualise bmi, echo = FALSE}
+# Use ggplot to visually represent the correlation between bmi and charges, highlighting smokers vs non-smokers 
+ggplot(insurance_df, aes( x = bmi, y = charges, color = smoker)) + geom_point() + geom_smooth(method = "lm", col = "blue") + labs(title = "Linear Regression of BMI on Charges", x = "BMI", y = "Charges")
+```
+
+```{r visualise age, echo = FALSE}
+# Use ggplot to visually represent the correlation between age and charges, highlighting smokers vs non-smokers 
+ggplot(insurance_df, aes( x = age, y = charges, color = smoker)) + geom_point() + geom_smooth(method = "lm", col = "blue") + labs(title = "Linear Regression of Age on Charges ", x = "Age", y = "Charges")
+```
+
 ```{r visualise, echo = FALSE}
-# Use ggplot to visually represent the linear regression model
-ggplot(insurance_df, aes( x = bmi + age + children, y = charges, color = smoker)) + geom_point() + geom_smooth(method = "lm", col = "blue") + labs(title = "Linear Regression of BMI, Age, No. of Children and Smoker (Y/N) on Charges ", x = "BMI, Age, Children and Smoker (Yes/No) ", y = "Charges")
+# Use ggplot to visually represent the correlation between no. of children and charges, highlighting smokers vs non-smokers 
+ggplot(insurance_df, aes( x = children, y = charges, color = smoker)) + geom_point() + geom_smooth(method = "lm", col = "blue") + labs(title = "Linear Regression of No. of Children on Charges ", x = "No. of Children", y = "Charges")
+
 ```
 
 # 7. Conclusion 
 
-Also there were some strong p-values for age, BMI and smoker's indicating some strong statistical significant in predicting charges. The linear regression is limited as all Homoscedasticity and Normality assumptions were not met. 
+Age, BMI, and smoking status show strong statistical significance in predicting healthcare charges due to their small p-values.The linear regression is limited as Homoscedasticity and Normality assumptions were not met. 
