@@ -1,0 +1,129 @@
+---
+title: "Logistic Regression Analysis Report"
+author: "Grace Hardy"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+# Load packages 
+library(tidyverse)
+library(broom)
+library(ggplot2)
+library(lmtest)
+library(car)
+library(caret)
+library(MASS)
+library(glmnet)
+library(remotes)
+library(rlang)
+library(here)
+```
+
+```{r fileload, include=FALSE}
+# Create file path, the here function enables files to be located relative to the project root
+diabetes_path <- here("Data", "diabetes.csv")
+
+#tryCatch statement to safely try loading diabetes data
+if (file.exists(diabetes_path)) {
+  diabetes_df <- tryCatch(
+    read.csv(diabetes_path, stringsAsFactors = FALSE),
+    error = function(e) {
+      stop("Error reading CSV file: ", e$message)
+    }
+  )
+  cat("Diabetes file loaded successfully.\n")
+} else {
+  cat("Diabetes file not found in current working directory.\n")
+}
+```
+# 1. Exploratory Analysis
+
+Print the first few rows of the diabetes data:
+```{r head, echo=FALSE}
+# Use head function to display first 6 rows 
+head(diabetes_df)
+```
+
+Print the last few rows of the diabetes data:
+```{r tail, echo=FALSE}
+# Use tail function to display last 6 rows 
+tail(diabetes_df)
+```
+No obvious data or formatting errors and the column headings look representative of their values. 
+
+Summary statistics of the diabetes data:
+```{r summary, echo=FALSE}
+# Use summary function to display summary statistics of data frame 
+ summary(diabetes_df)
+```
+
+Display the type of each variable:
+```{r type, echo =FALSE}
+str(diabetes_df)
+```
+
+All variables are numerical so do not need converting to a factor except for the Outcome variable which should be treated as a factor for logistic regression. 
+
+```{r Outcome Variable Conversion, echo=FALSE}
+#Define Outcome variable
+outcome <- diabetes_df$Outcome
+
+#Convert outcome variable to factor
+diabetes_df$Outcome <- factor(diabetes_df$Outcome, levels = c(0, 1), labels = c("No", "Yes"))
+
+#Define Outcome variable
+outcome <- diabetes_df$Outcome
+```
+
+For pregnancies, maximum value of 17 seems quite large but mean is quite close to the median so no indication of right-skewness and this could be a plausible real-world value.
+
+Zero values for Glucose, BloodPressure, SkinThickness, Insulin and BMI could suggest some missing data collection. This is shown below. 
+
+```{r missing values, echo=FALSE}
+
+#Find all rows that have a value of 0
+colSums(diabetes_df == 0)
+
+```
+
+The table above shows that the highest number of zero values occur in the SkinThickness and Insulin variables, further implying that there is some missing data for these values, which may impact the validity of further model applications. Pregnancy is also showing as having zero values, but this is a real-world expected value.
+
+For Insulin, the mean is significantly larger than the median which could indicate right skewness or presence of outlier values, the large max value in comparison to the 3rd quartile value also suggests this.
+
+```{r outliers, echo =FALSE}
+#Define insulin variable
+insulin <- diabetes_df$Insulin
+#Use boxplot function to check for outliers in Insulin data by plotting a boxplot
+boxplot(insulin, main = "Box Plot of Insulin")
+#Use hist function to check for outliers in insulin data by plotting a histogram
+hist(insulin, main = "Histogram of Insulin",  xlab = "Insulin")
+```
+
+Extreme values indicated by box plot are to be kept as they are plausible real-world values.
+
+# Define Variables based on columns in the diabetes data frame
+```{r variables, echo=FALSE}
+
+pregnancies <- diabetes_df$Pregnancies
+glucose <- diabetes_df$Glucose
+blood_pressure <- diabetes_df$BloodPressure
+skin_thickness <- diabetes_df$SkinThickness
+bmi <- diabetes_df$BMI
+diabetes_pedigree_fn <-diabetes_df$DiabetesPedigreeFunction
+age <- diabetes_df$Age
+
+
+for (col in colnames(diabetes_df)){
+  if (col != "Outcome") {
+  plot <-  ggplot(diabetes_df, aes( x = .data[[col]], y = outcome)) +
+  geom_point(color = "blue", size = 2 ) +
+  labs(title = paste("Plot of", col, "vs Outcome"),
+       x = col,
+       y = "Outcome")
+  print(plot)
+}}
+```
+
+The initial plots show that no. of pregnancies, glucose, blood pressure may be correlated with the outcome of diabetes, which should be validated further with logistic model applications.   
