@@ -6,21 +6,6 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-# Set up such that as part of this report all required packages are installed using repo = http://cran.us.r-project.org
-
-options(repos = c(CRAN = "http://cran.us.r-project.org"))
-# Install required packages
-install.packages(c(
-  "broom",
-  "car",
-  "caret",
-  "MASS",
-  "glmnet",
-  "lmtest", 
-  "ggplot2", 
-  "remotes",
-  "rlang",
-  "here"))
 
 # Load packages 
 library(tidyverse)
