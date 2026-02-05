@@ -469,6 +469,62 @@ ratio.</p>
                     data = train_reg,
                     family = &quot;binomial&quot;)</code></pre>
 </div>
+<div id="model-summary" class="section level1">
+<h1>4. Model Summary</h1>
+<pre><code>## 
+## Call:
+## glm(formula = outcome ~ pregnancies + glucose + blood_pressure, 
+##     family = &quot;binomial&quot;, data = train_reg)
+## 
+## Coefficients:
+##                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)    -5.524483   0.498745 -11.077  &lt; 2e-16 ***
+## pregnancies     0.126294   0.025837   4.888 1.02e-06 ***
+## glucose         0.037516   0.003318  11.308  &lt; 2e-16 ***
+## blood_pressure -0.004235   0.004478  -0.946    0.344    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 993.48  on 767  degrees of freedom
+## Residual deviance: 784.06  on 764  degrees of freedom
+## AIC: 792.06
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p>Residual deviance value is high at 784.06 which indicates this model
+may not be the best fit for this data set.</p>
+<p>Significance codes are low; around zero, for no. of pregnancies and
+glucose levels which means they are statistically significant in
+predicting diabetes outcomes. However, the significance code for blood
+pressure is high indicating that this is not a statistically significant
+indicator of the outcome and this variable can be removed from the
+model.</p>
+<pre><code>## 
+## Call:
+## glm(formula = outcome ~ pregnancies + glucose, family = &quot;binomial&quot;, 
+##     data = train_reg)
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -5.751540   0.440659 -13.052  &lt; 2e-16 ***
+## pregnancies  0.123287   0.025590   4.818 1.45e-06 ***
+## glucose      0.037080   0.003275  11.322  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 993.48  on 767  degrees of freedom
+## Residual deviance: 784.95  on 765  degrees of freedom
+## AIC: 790.95
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<p>Residual deviance value is high at 784.95 which indicates this model
+may not be the best fit for this data set. However, the AIC value is
+lower at 790.95 compared to 792.06 from the first fit of the model,
+which suggests this a better model with less unnecessary variables.</p>
+</div>
 
 
 

@@ -162,4 +162,30 @@ logistic_model <- glm(outcome ~ pregnancies + glucose + blood_pressure,
                     family = "binomial")
 
 ```
+# 4.  Model Summary 
+```{r lm summary , echo=FALSE}
+#Use summary function to display summary statistics of the linear regression model
+summary(logistic_model)
+
+```
+Residual deviance value is high at 784.06 which indicates this model may not be the best fit for this data set.
+
+Significance codes are low; around zero,  for no. of pregnancies and glucose levels which means they are statistically significant in predicting diabetes outcomes. However, the significance code for blood pressure is high indicating that this is not a statistically significant indicator of the outcome and this variable can be removed from the model. 
+
+
+```{r lm_v1, echo=FALSE}
+#Use glm function to fit a logistic regression model
+logistic_model_v1 <- glm(outcome ~ pregnancies + glucose,
+                    data = train_reg,
+                    family = "binomial")
+
+#Use summary function to display summary statistics of the logistic regression model
+summary(logistic_model_v1)
+```
+
+Residual deviance value is high at 784.95 which indicates this model may not be the best fit for this data set. However, the AIC value is lower at 790.95 compared to 792.06 from the first fit of the model, which suggests this a better model with less unnecessary variables.
+
+
+
+
 
