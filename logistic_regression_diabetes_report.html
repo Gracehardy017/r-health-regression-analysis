@@ -11,7 +11,7 @@
 
 <meta name="author" content="Grace Hardy" />
 
-<meta name="date" content="2026-02-02" />
+<meta name="date" content="2026-02-05" />
 
 <title>Logistic Regression Analysis Report</title>
 
@@ -352,7 +352,7 @@ display: none;
 
 <h1 class="title toc-ignore">Logistic Regression Analysis Report</h1>
 <h4 class="author">Grace Hardy</h4>
-<h4 class="date">2026-02-02</h4>
+<h4 class="date">2026-02-05</h4>
 
 </div>
 
@@ -462,6 +462,12 @@ validated further with logistic model applications.</p>
 <h1>2. Splitting the Dataset</h1>
 <p>The dataset is split into training and test sets using an 80:20
 ratio.</p>
+</div>
+<div id="fit-logistic-regression-model" class="section level1">
+<h1>3. Fit Logistic Regression Model</h1>
+<pre class="r"><code>logistic_model &lt;- glm(outcome ~ pregnancies + glucose + blood_pressure,
+                    data = train_reg,
+                    family = &quot;binomial&quot;)</code></pre>
 </div>
 
 

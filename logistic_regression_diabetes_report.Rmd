@@ -149,4 +149,17 @@ test_reg <- diabetes_df[!split, ]
 
 ```
 
+# 3. Fit Logistic Regression Model
+
+```{r lm comment, echo=FALSE}
+#Use glm function to fit a logistic regression model
+```
+
+```{r lm}
+
+logistic_model <- glm(outcome ~ pregnancies + glucose + blood_pressure,
+                    data = train_reg,
+                    family = "binomial")
+
+```
 
