@@ -44,7 +44,8 @@ install.packages(c(
   "ggplot2", 
   "remotes",
   "rlang",
-  "here"))
+  "here",
+  "caTools"))
 ```  
 
 2. Run R code to produce the analysis reports:

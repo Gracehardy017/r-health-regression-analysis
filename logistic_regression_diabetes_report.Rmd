@@ -20,6 +20,7 @@ library(remotes)
 library(rlang)
 library(here)
 library(caTools)
+library(data.table)
 
 ```
 
@@ -168,10 +169,10 @@ logistic_model <- glm(outcome ~ pregnancies + glucose + blood_pressure,
 summary(logistic_model)
 
 ```
-Residual deviance value is high at 784.06 which indicates this model may not be the best fit for this data set.
 
-Significance codes are low; around zero,  for no. of pregnancies and glucose levels which means they are statistically significant in predicting diabetes outcomes. However, the significance code for blood pressure is high indicating that this is not a statistically significant indicator of the outcome and this variable can be removed from the model. 
+For no. of pregnancies and glucose levels they have p-values which are less than 0.05, suggesting they are statistically significant predictors of diabetes outcomes. Both variable coefficients of 0.123287 and 0.037080 are positive, which suggests the higher number of pregnancies and higher glucose levels increase the probability of diabetes in this dataset. 
 
+However for blood pressure, this has a high p-value > 0.1, indicating that this is not a statistically significant indicator of the outcome. The model can be refitted to remove the variable that is not significant. 
 
 ```{r lm_v1, echo=FALSE}
 #Use glm function to fit a logistic regression model
@@ -183,9 +184,93 @@ logistic_model_v1 <- glm(outcome ~ pregnancies + glucose,
 summary(logistic_model_v1)
 ```
 
-Residual deviance value is high at 784.95 which indicates this model may not be the best fit for this data set. However, the AIC value is lower at 790.95 compared to 792.06 from the first fit of the model, which suggests this a better model with less unnecessary variables.
+The AIC value is slightly lower at 790.95 compared to 792.06 from the first fit of the model, which suggests this a better model with the removal of the variable that is not statistically significant. 
+
+The difference between the residual and the null deviance is equal to 208.53. The difference between the degrees of freedom between residual and null deviance is equal to 2; corresponding to the 2 additional predictors. This suggests that the logistic model reduces the deviance in the model and is a better fit compared to the null model with the addition of the pregnancy and glucose variables. 
 
 
+# 5. Check Assumptions
+
+Assumption #1: The Response Variable is Binary
+
+Display the type of each variable:
+```{r type_for_binary_test, echo =FALSE}
+str(diabetes_df)
+```
+Assumption met: Only two possible outcomes in this data set, "Yes" and "No" as logistic regression assumes a binary response variable. 
+
+Assumption #2: The Observations are Independent
+
+Independence can only be verified on data collection and cannot be formally tested. 
+
+Assumption #3: There is No Multicollinearity Among Explanatory Variables
+
+```{r VIF, echo=FALSE}
+#Calculate the VIF value of the logistic regression model
+
+vif(logistic_model_v1)
+
+#Create a vector value of the VIF values
+
+vifs <- vif(logistic_model_v1)
+
+#Display each vector value on a horizontal bar chart
+barplot(vifs, main ="VIF Values", horiz = TRUE, col = "purple")
+
+```
+The VIF values for no. of pregnancies and glucose levels are 1.001006 which is less than 5, which indicates very little correlation between the two variables,  so the assumption of no multicollinearity is met for this model.
+
+Assumption #4: There are No Extreme Outliers
+
+```{r cd, echo=FALSE}
+
+#find Cook's distance for each observation in the dataset
+cd <- cooks.distance(logistic_model_v1)
+
+# Plot Cook's Distance with a horizontal line at 4/n to see which observations exceed this threshold
+
+#identify no. of row in diabetes datframe
+n <- nrow(diabetes_df)
+#plot cooks distance 
+plot(cd, main = "Cooks Distance for Influential Obs")
+#add a cutoff line at 4/n to identify influential observations
+abline(h = 4/n, lty = 2, col = "steelblue") 
+
+```
+
+There are some observations in this data set that largely exceed the 4/n line. These datapoints are likely influencial points and have a strong influence on the regression model. As this data set represents real life data these values should remain. However, this observation does serve as a limitation of this model. 
 
 
+#5: There is a Linear Relationship Between Explanatory Variables and the Logit of the Response Variable
 
+```{r bt, echo = FALSE}
+
+#Create a copy of the dataframe for box Tidwell
+diabetes_df_bt <- copy(diabetes_df)
+
+#Remove 0 values as box Tidwell only accepts positive values
+diabetes_df_bt <- subset(diabetes_df_bt, Pregnancies > 0 & Glucose > 0)
+
+# For each of the predictor columns create a column with contains the natural log i.e. Pregnancies * Log(Pregnancies)
+
+diabetes_df_bt$LogPregnancies <- diabetes_df_bt$Pregnancies *log(diabetes_df_bt$Pregnancies)
+diabetes_df_bt$LogGlucose <- diabetes_df_bt$Glucose * log(diabetes_df_bt$Glucose)
+
+# Fit the logistic model again with the addition of the natural log columns
+
+logistic_model_v2 <- glm(Outcome ~ Pregnancies + Glucose + LogPregnancies + LogGlucose,
+                         data = diabetes_df_bt,
+                         family = binomial)
+
+summary(logistic_model_v2)
+```
+For the natural log values of no. of pregnancies and glucose levels they have p-values which are greater than 0.1; LogPregnancies (0.98127) and  LogGlucose (0.34402). Therefore, these variables are likely not statistically significant predictors of diabetes outcomes. This means that the assumption of linearity between the explanatory variables and the logit of the response variable is met. This was tested using Box-Tidwell. 
+
+#6: The Sample Size is Sufficiently Large
+
+# Find total number of observations
+```{r len df, echo=FALSE}
+# Find total number of observations
+print(paste("Rows in the Dataframe :",nrow(diabetes_df)))
+```
+Total number of observations is 768 which is greater than 500, therefore the assumption of large sample size is met. 
