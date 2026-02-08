@@ -45,7 +45,8 @@ install.packages(c(
   "remotes",
   "rlang",
   "here",
-  "caTools"))
+  "caTools",
+  "data.table"))
 ```  
 
 2. Run R code to produce the analysis reports:
