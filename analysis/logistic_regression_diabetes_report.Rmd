@@ -329,8 +329,7 @@ misClassError(test_reg$Outcome, predicted, threshold=optimal)
 
 ```
 
-Confusion matrix tells us . High true postive rate of
-Missclassification error is 24.03 %, which is quite high, this indicates that the model may be not be the most accurate predictor of whether an individual will have diabetes or not. 
+True postive rate of 42.6% indicates that the model correctly predicts a positive diabetes outcome in 42.6% of cases. For the true negative rate, the model accurately predicts a negative diabetes outcome in 88% of cases. Misclassification error is 24.03 %, which is quite high, this indicates that the model may have some limitations in accurate prediction of whether an individual will have diabetes or not, this could perhaps be influenced by the low sensitivity rate.
 
 ```{r ROC, echo=FALSE}
 
@@ -338,3 +337,11 @@ Missclassification error is 24.03 %, which is quite high, this indicates that th
 plotROC(test_reg$Outcome, predicted)
 
 ```
+
+The AUC is 0.8363, which is reasonably high, indicates the model does a fairly good job of predicting the diabetes outcome. 
+
+
+# 7. Conclusion 
+
+The logistic regression model with predictors no. of pregnancies, glucose and blood pressure levels is fairly good at predicting the diabetes outcome as shown by its AUC value. However, this is limited due to the violation of the assumption that there are no extreme outliers as shown by the cooks distance test as well as the fairly high misclassification error and low sensitivity.
+

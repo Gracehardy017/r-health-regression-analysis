@@ -46,7 +46,10 @@ install.packages(c(
   "rlang",
   "here",
   "caTools",
-  "data.table"))
+  "data.table",
+  "InformationValue"))
+  
+devtools::install_github("selva86/InformationValue")  
 ```  
 
 2. Run R code to produce the analysis reports:
