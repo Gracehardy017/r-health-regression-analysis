@@ -1,0 +1,50 @@
+
+# Install Necessary Packages - Only required the first time
+
+install.packages(c(
+  "broom",
+  "car",
+  "caret",
+  "MASS",
+  "glmnet",
+  "lmtest", 
+  "ggplot2", 
+  "remotes"
+))
+
+remove.packages("rlang")
+install.packages("rlang")
+
+
+# Load packages into your R environment 
+
+library(tidyverse)
+library(broom)
+library(ggplot2)
+library(lmtest)
+library(car)
+library(caret)
+library(MASS)
+library(glmnet)
+library(remotes)
+library(rlang)
+
+
+#Load Insurance Data Set
+insurance <- read.csv('Data/insurance.csv')
+
+# Print the first few rows
+head(insurance)
+
+# Print the last few rows
+tail(insurance)
+
+# Summary statistics
+summary(insurance)
+
+# Display the type of each variable
+str(insurance)
+
+#Plot the graph of bmi against charges highlighting smokers and non smokers
+
+ggplot(insurance, aes(x = bmi, y = charges , color = smoker )) + geom_point()

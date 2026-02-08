@@ -329,9 +329,8 @@ misClassError(test_reg$Outcome, predicted, threshold=optimal)
 
 ```
 
-Confusion matrix tells us and true postive rate indicates that the model is fairly good at predicting the true positives as 88 would be truly predicted out of a sample of 100. 
-This is also true for the true negative rate, accurately predicting 23 out of a sample of 100. 
-Missclassification error is 24.03 %, which is quite high, this indicates that the model may have some limitations in accurate prediction of whether an individual will have diabetes or not. 
+Confusion matrix tells us . High true postive rate of
+Missclassification error is 24.03 %, which is quite high, this indicates that the model may be not be the most accurate predictor of whether an individual will have diabetes or not. 
 
 ```{r ROC, echo=FALSE}
 
@@ -339,7 +338,3 @@ Missclassification error is 24.03 %, which is quite high, this indicates that th
 plotROC(test_reg$Outcome, predicted)
 
 ```
-The AUC is 0.8363, which is reasonably high, indicates the model does a fairly good job of predicting the diabetes outcome.  
-
-
-
